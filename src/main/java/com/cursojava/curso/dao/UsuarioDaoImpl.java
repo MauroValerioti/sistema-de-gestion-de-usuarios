@@ -41,18 +41,22 @@ public class UsuarioDaoImpl implements UsuarioDao {
 
     @Override
     //verifica que las credenciales usuario y password sean iguales.
-    public boolean verificarcredenciales(Usuario usuario) {
+    public Usuario obtenerUsuarioPorCredenciales(Usuario usuario) {
         String query = "FROM Usuario WHERE email = :email";
         List<Usuario> lista = entityManager.createQuery(query)
                 .setParameter("email", usuario.getEmail())
                 .getResultList();
 
   if (lista.isEmpty()){
-   return false;
+      //si el usuario no existe.
+   return null;
   }
         String passwordHashed = lista.get(0).getPassword();
 
         Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
-        return argon2.verify(passwordHashed, usuario.getPassword());
-    }
+        if( argon2.verify(passwordHashed, usuario.getPassword())){
+            return lista.get(0);
+        }
+        //si las credenciales no fueron correctas.
+        return null;    }
 }
