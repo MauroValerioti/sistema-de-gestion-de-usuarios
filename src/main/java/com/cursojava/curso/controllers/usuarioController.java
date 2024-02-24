@@ -29,14 +29,15 @@ public class usuarioController {
         Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
         String hash = argon2.hash(1, 1024, 1, usuario.getPassword());
 
-        //usuarioDao.getUsuario().setPassword(hash);
+        //usuarioDao.getUsuario()
+                usuario.setPassword(hash);
         //usuarioDao.registrar(hash);
 
-        // Actualizar la contraseña con el hash.
-        usuario.setPassword(hash);
-
-        // Registrar el usuario en la base de datos.
-        usuarioDao.registrar(usuario);
+//        // Actualizar la contraseña con el hash.
+//        usuario.setPassword(hash);
+//
+//        // Registrar el usuario en la base de datos.
+//        usuarioDao.registrar(usuario);
 
     }
 

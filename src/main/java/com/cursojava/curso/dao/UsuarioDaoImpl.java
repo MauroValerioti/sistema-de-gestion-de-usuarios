@@ -1,6 +1,8 @@
 package com.cursojava.curso.dao;
 
 import com.cursojava.curso.models.Usuario;
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
@@ -38,24 +40,19 @@ public class UsuarioDaoImpl implements UsuarioDao {
     }
 
     @Override
+    //verifica que las credenciales usuario y password sean iguales.
     public boolean verificarcredenciales(Usuario usuario) {
-        String query = "FROM Usuario WHERE email = :email AND password = :password";
+        String query = "FROM Usuario WHERE email = :email";
         List<Usuario> lista = entityManager.createQuery(query)
                 .setParameter("email", usuario.getEmail())
-                .setParameter("password", usuario.getPassword())
                 .getResultList();
 
+  if (lista.isEmpty()){
+   return false;
+  }
+        String passwordHashed = lista.get(0).getPassword();
 
-        System.out.println("password ingresado: " + usuario.getPassword());
-        if (!lista.isEmpty()) {
-            System.out.println("password en la DB: " + lista.get(0).getPassword());
-        } else {
-            System.out.println("La lista está vacía, no se encontró ningún usuario.");
-        }
-
-
-        //returna un boolean segun si encuentra o no un usuario con esas credenciales
-        return !lista.isEmpty();
+        Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
+        return argon2.verify(passwordHashed, usuario.getPassword());
     }
-
 }
